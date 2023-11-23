@@ -1,0 +1,56 @@
+[tool.poetry]
+name = "acat"
+version = "0.1.0"
+description = ""
+authors = ["Heyuan Zeng <hi@universe.observer>"]
+readme = "README.md"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.report]
+exclude_also = [
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+]
+
+[tool.coverage.run]
+omit = ["src/gap/gradescope/resources/*"]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["ASYNC", "I", "ICN"]
+ignore = []
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+praat-parselmouth = "^0.4.3"
+praatio = "^6.1.0"
+pyqt6 = "^6.6.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pyqt6-stubs = {git = "https://github.com/python-qt-tools/PyQt6-stubs.git"}
+ruff = "^0.1.6"
+pre-commit = "^3.5.0"
+isort = "^5.12.0"
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+pytest-qt = "^4.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
