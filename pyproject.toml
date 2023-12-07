@@ -1,56 +1,57 @@
-[build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core"]
+[tool.poetry]
+name = "acat"
+version = "0.1.0"
+description = ""
+authors = ["Heyuan Zeng <hi@universe.observer>"]
+readme = "README.md"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.coverage.report]
 exclude_also = [
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-  "class .*\\bProtocol\\):"
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
 ]
 
 [tool.coverage.run]
 omit = ["src/gap/gradescope/resources/*"]
 
-[tool.poetry]
-authors = ["Heyuan Zeng <hi@universe.observer>"]
-description = ""
-name = "acat"
-readme = "README.md"
-version = "0.1.0"
-
-[tool.poetry.dependencies]
-praat-parselmouth = "^0.4.3"
-praatio = "^6.1.0"
-pyqt6 = "^6.6.0"
-python = "~3.12"
-
-[tool.poetry.group.dev.dependencies]
-isort = "^5.12.0"
-pre-commit = "^3.5.0"
-pyinstaller = "^6.2.0"
-pyqt6-stubs = {git = "https://github.com/python-qt-tools/PyQt6-stubs.git"}
-pytest = "^7.4.3"
-pytest-cov = "^4.1.0"
-pytest-qt = "^4.2.0"
-ruff = "^0.1.6"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-
 [tool.ruff]
 target-version = "py312"
 
+[tool.ruff.lint]
+select = ["ASYNC", "I", "ICN"]
+ignore = []
+
 [tool.ruff.format]
-# Like Black, indent with spaces, rather than tabs.
-indent-style = "space"
-# Like Black, automatically detect the appropriate line ending.
-line-ending = "auto"
 # Like Black, use double quotes for strings.
 quote-style = "double"
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
 # Like Black, respect magic trailing commas.
 skip-magic-trailing-comma = false
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
 
-[tool.ruff.lint]
-ignore = []
-select = ["ASYNC", "I", "ICN"]
+[tool.poetry.dependencies]
+python = "~3.12"
+praat-parselmouth = "^0.4.3"
+praatio = "^6.1.0"
+pyqt6 = "^6.6.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pyqt6-stubs = {git = "https://github.com/python-qt-tools/PyQt6-stubs.git"}
+ruff = "^0.1.6"
+pre-commit = "^3.5.0"
+isort = "^5.12.0"
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+pytest-qt = "^4.2.0"
+pyinstaller = "^6.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
