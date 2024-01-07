@@ -1,7 +1,8 @@
 from functools import partial
-from typing import Callable, Tuple
+from typing import Callable, Iterable
 
 from PyQt6.QtWidgets import (
+    QHBoxLayout,
     QPushButton,
     QTableWidget,
     QTableWidgetItem,
@@ -9,11 +10,11 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-RowInfoType = Tuple[str, int, float | None]
+from acat.ui.audio_file import AudioFileInfo
 
 
 class ContentTable(QTableWidget):
-    COL_HEADERS = ["File Name", "Audio Length", "Score", "Judge", "Open"]
+    COL_HEADERS = ["File Name", "Audio Length", "Score", "Actions"]
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -22,25 +23,41 @@ class ContentTable(QTableWidget):
     def _setup_list(self) -> None:
         self.setColumnCount(len(self.COL_HEADERS))
         self.setHorizontalHeaderLabels(self.COL_HEADERS)
+        self.setColumnWidth(3, 200)
 
-    def add_row(self, row: RowInfoType) -> None:
+    def add_row(self, row: AudioFileInfo) -> None:
         row_position = self.rowCount()
 
         self.insertRow(row_position)
 
-        file_name, audio_length, score = row
+        self.setItem(row_position, 0, QTableWidgetItem(row.file_name))
+        self.setItem(row_position, 1, QTableWidgetItem(row.audio_length_str))
+        self.setItem(row_position, 2, QTableWidgetItem(str(row.score)))
 
-        self.setItem(row_position, 0, QTableWidgetItem(file_name))
-        self.setItem(row_position, 1, QTableWidgetItem(str(audio_length)))
-        self.setItem(row_position, 2, QTableWidgetItem(str(score)))
+        self.setCellWidget(row_position, 3, self._create_actions(row_position))
+
+    def _create_actions(self, row_position: int) -> QWidget:
+        button_widget = QWidget()
+        button_layout = QHBoxLayout()
+        button_layout.setContentsMargins(0, 0, 0, 0)
+        button_layout.setSpacing(5)
 
         judge_score_button = QPushButton("Judge Score")
         judge_score_button.clicked.connect(self._gen_judge_score_handle(row_position))
-        self.setCellWidget(row_position, 3, judge_score_button)
 
         open_file_info_button = QPushButton("Open File Info")
         open_file_info_button.clicked.connect(self._gen_open_info_handle(row_position))
-        self.setCellWidget(row_position, 4, open_file_info_button)
+
+        button_layout.addWidget(judge_score_button)
+        button_layout.addWidget(open_file_info_button)
+
+        button_widget.setLayout(button_layout)
+
+        return button_widget
+
+    def add_rows(self, rows: Iterable[AudioFileInfo]) -> None:
+        for row in rows:
+            self.add_row(row)
 
     def _gen_open_info_handle(self, row_index: int) -> Callable:
         return partial(self.open_info, row_index)

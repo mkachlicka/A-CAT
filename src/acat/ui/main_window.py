@@ -1,6 +1,9 @@
-from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QMainWindow
+import pathlib
 
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QFileDialog, QMainWindow
+
+from acat.ui.audio_file import AudioFileInfo
 from acat.ui.content_view import ContentView
 
 
@@ -19,11 +22,24 @@ class MainWindow(QMainWindow):
 
     def _create_actions(self) -> None:
         self._choose_action = QAction("&Choose", self)
+        self._choose_action.triggered.connect(self._choose_file)
         self._evaluate_all_action = QAction("&Evaluate All", self)
         self._export_action = QAction("&Export", self)
 
         self._help_action = QAction("&Help", self)
         self._load_sample_audio = QAction("&Load Sample", self)
+
+    def _choose_file(self) -> None:
+        files, _ = QFileDialog.getOpenFileNames(
+            self,
+            "Select Audio Files",
+            "",
+            "Audio Files (*.wav *.mp3 *.py)",
+        )
+
+        file_info = [AudioFileInfo(pathlib.Path(file)) for file in files]
+
+        self._content_view.table.add_rows(file_info)
 
     def _make_toolbar(self) -> None:
         top_toolbar = self.addToolBar("General Actions")
