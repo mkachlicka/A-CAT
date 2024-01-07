@@ -406,6 +406,17 @@ pyyaml = ">=5.1"
 virtualenv = ">=20.10.0"
 
 [[package]]
+name = "pydub"
+version = "0.25.1"
+description = "Manipulate audio with an simple and easy high level interface"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pydub-0.25.1-py2.py3-none-any.whl", hash = "sha256:65617e33033874b59d87db603aa1ed450633288aefead953b30bded59cb599a6"},
+    {file = "pydub-0.25.1.tar.gz", hash = "sha256:980a33ce9949cab2a569606b65674d748ecbca4f0796887fd6f46173a7b0d30f"},
+]
+
+[[package]]
 name = "pyinstaller"
 version = "6.2.0"
 description = "PyInstaller bundles a Python application and all its dependencies into a single package."
@@ -727,4 +738,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.12"
-content-hash = "022d16fc1110d110753803a8eed4b2a876b07fc5e7247292adf62cfc77327a7d"
+content-hash = "9fd54d5a64fa9f70ccc5db083a9e229bd224d12e9108257eea9076c13a0a05e0"
