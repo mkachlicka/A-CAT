@@ -25,6 +25,8 @@ class MainWindow(QMainWindow):
         self._choose_action.triggered.connect(self._choose_file)
 
         self._evaluate_all_action = QAction("&Judge All", self)
+        self._evaluate_all_action.triggered.connect(self._judge_all_rows)
+
         self._export_action = QAction("&Export", self)
 
         self._help_action = QAction("&Help", self)
@@ -41,6 +43,9 @@ class MainWindow(QMainWindow):
         file_info = [AudioFileInfo(pathlib.Path(file)) for file in files]
 
         self._content_view.table.add_rows(file_info)
+
+    def _judge_all_rows(self) -> None:
+        self._content_view.table.judge_all_scores()
 
     def _make_toolbar(self) -> None:
         top_toolbar = self.addToolBar("General Actions")
