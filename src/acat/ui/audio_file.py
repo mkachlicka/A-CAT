@@ -1,13 +1,19 @@
 import pathlib
 from dataclasses import dataclass, field
+from typing import NamedTuple
 
 from pydub import AudioSegment
+
+
+class PraatScore(NamedTuple):
+    comprehensibility: float
+    nativelikeness: float
 
 
 @dataclass
 class AudioFileInfo:
     path: pathlib.Path
-    score: float | None = field(default=None)
+    score: PraatScore | None = field(default=None)
     audio: str | None = field(default=None, init=False)
 
     def __post_init__(self) -> None:
@@ -28,3 +34,27 @@ class AudioFileInfo:
     @property
     def audio_length_str(self) -> str:
         return f"{self.audio_length:.2f} s"
+
+    @property
+    def comprehensibility(self) -> float | None:
+        if self.score:
+            return self.score.comprehensibility
+        return None
+
+    @property
+    def nativelikeness(self) -> float | None:
+        if self.score:
+            return self.score.nativelikeness
+        return None
+
+    @property
+    def comprehensibility_str(self) -> str:
+        if self.comprehensibility:
+            return f"{self.comprehensibility:.2f}"
+        return "N/A"
+
+    @property
+    def nativelikeness_str(self) -> str:
+        if self.nativelikeness:
+            return f"{self.nativelikeness:.2f}"
+        return "N/A"

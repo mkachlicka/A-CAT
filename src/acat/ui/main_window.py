@@ -23,7 +23,8 @@ class MainWindow(QMainWindow):
     def _create_actions(self) -> None:
         self._choose_action = QAction("&Choose", self)
         self._choose_action.triggered.connect(self._choose_file)
-        self._evaluate_all_action = QAction("&Evaluate All", self)
+
+        self._evaluate_all_action = QAction("&Judge All", self)
         self._export_action = QAction("&Export", self)
 
         self._help_action = QAction("&Help", self)

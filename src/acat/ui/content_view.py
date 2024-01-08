@@ -1,8 +1,10 @@
+from collections import deque
 from functools import partial
-from typing import Callable, Iterable
+from typing import Callable, Deque, Iterable
 
 from PyQt6.QtWidgets import (
     QHBoxLayout,
+    QMessageBox,
     QPushButton,
     QTableWidget,
     QTableWidgetItem,
@@ -10,6 +12,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from acat.backend.judge_score import generate_praat_score
 from acat.ui.audio_file import AudioFileInfo
 
 
@@ -18,6 +21,7 @@ class ContentTable(QTableWidget):
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
+        self.data: Deque[AudioFileInfo] = deque()
         self._setup_list()
 
     def _setup_list(self) -> None:
@@ -35,6 +39,35 @@ class ContentTable(QTableWidget):
         self.setItem(row_position, 2, QTableWidgetItem(str(row.score)))
 
         self.setCellWidget(row_position, 3, self._create_actions(row_position))
+
+        self.data.append(row)
+
+    def _judge_row(self, row_position: int) -> None:
+        try:
+            row_data = self.data[row_position]
+        except IndexError:
+            QMessageBox.critical(
+                self, "Error", "This is an internal error. Please notify the developer."
+            )
+            return
+
+        if not row_data.path.exists():
+            QMessageBox.critical(
+                self,
+                "Error",
+                "This audio file does not exist. Please choose a proper file to analyze.",
+            )
+            return
+
+        if row_data.path.is_dir():
+            QMessageBox.critical(
+                self,
+                "Error",
+                "A directory has been chosen, which shouldn't happen. Please notify the developer.",
+            )
+            return
+
+        generate_praat_score(row_data.path, row_data.text_grid_path)
 
     def _create_actions(self, row_position: int) -> QWidget:
         button_widget = QWidget()
