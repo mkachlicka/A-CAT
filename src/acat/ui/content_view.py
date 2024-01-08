@@ -1,6 +1,5 @@
-from collections import deque
 from functools import partial
-from typing import Callable, Deque, Iterable, List
+from typing import Callable, Iterable, List
 
 from PyQt6.QtWidgets import (
     QHBoxLayout,
@@ -21,7 +20,7 @@ class ContentTable(QTableWidget):
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        self.data: Deque[AudioFileInfo] = deque()
+        self.data: List[AudioFileInfo] = []
         self._setup_list()
 
     def _setup_list(self) -> None:
@@ -82,8 +81,12 @@ class ContentTable(QTableWidget):
         open_file_info_button = QPushButton("Info")
         open_file_info_button.clicked.connect(self._gen_open_info_handle(row_position))
 
+        del_row_button = QPushButton("Delete")
+        del_row_button.clicked.connect(self._gen_delete_row_handle(row_position))
+
         button_layout.addWidget(judge_score_button)
         button_layout.addWidget(open_file_info_button)
+        button_layout.addWidget(del_row_button)
 
         button_widget.setLayout(button_layout)
 
@@ -98,6 +101,13 @@ class ContentTable(QTableWidget):
 
     def _gen_judge_score_handle(self, row_index: int) -> Callable:
         return partial(self.judge_score, row_index)
+
+    def _gen_delete_row_handle(self, row_index: int) -> Callable:
+        return partial(self.delete_row, row_index)
+
+    def delete_row(self, row_index: int) -> None:
+        self.removeRow(row_index)
+        self.data.pop(row_index)
 
     def open_info(self, row_index: int) -> None:
         # TODO: implement open info pop up
