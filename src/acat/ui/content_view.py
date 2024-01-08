@@ -76,10 +76,10 @@ class ContentTable(QTableWidget):
         button_layout.setContentsMargins(0, 0, 0, 0)
         button_layout.setSpacing(5)
 
-        judge_score_button = QPushButton("Judge Score")
+        judge_score_button = QPushButton("Judge")
         judge_score_button.clicked.connect(self._gen_judge_score_handle(row_position))
 
-        open_file_info_button = QPushButton("Open File Info")
+        open_file_info_button = QPushButton("Info")
         open_file_info_button.clicked.connect(self._gen_open_info_handle(row_position))
 
         button_layout.addWidget(judge_score_button)
