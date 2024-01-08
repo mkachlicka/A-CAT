@@ -11,11 +11,13 @@ from praatio import textgrid
 
 from acat.ui.audio_file import PraatScore
 
-_SUPPORT_PATH = Path(__file__) / ".." / "support"
+_SUPPORT_PATH = Path(__file__).parent / "support"
 _SUPPORT_FUNC_PATH = _SUPPORT_PATH / "functions"
 
 _ANALYSIS_PRAAT_SCRIPT = _SUPPORT_FUNC_PATH / "SyllableNucleiv3.praat"
 _ANALYSIS_PRAAT_SCRIPT_STR = str(_ANALYSIS_PRAAT_SCRIPT.absolute())
+
+print(_ANALYSIS_PRAAT_SCRIPT_STR, _ANALYSIS_PRAAT_SCRIPT.exists())
 
 
 def _run_praat_script(audio_file_path: Path) -> Tuple[pd.DataFrame, pd.DataFrame]:
