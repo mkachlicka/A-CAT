@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Callable, Iterable, List
 
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QMessageBox,
@@ -13,6 +14,7 @@ from PyQt6.QtWidgets import (
 
 from acat.backend.judge_score import generate_praat_score
 from acat.ui.audio_file import AudioFileInfo
+from acat.ui.result_popup import ResultPopup
 
 
 class ContentTable(QTableWidget):
@@ -28,14 +30,28 @@ class ContentTable(QTableWidget):
         self.setHorizontalHeaderLabels(self.COL_HEADERS)
         self.setColumnWidth(3, 200)
 
+        self.popup = ResultPopup()
+
     def add_row(self, row: AudioFileInfo) -> None:
         row_position = self.rowCount()
 
         self.insertRow(row_position)
 
-        self.setItem(row_position, 0, QTableWidgetItem(row.file_name))
-        self.setItem(row_position, 1, QTableWidgetItem(row.audio_length_str))
-        self.setItem(row_position, 2, QTableWidgetItem(str(row.score)))
+        file_name_item = QTableWidgetItem(row.file_name)
+        file_name_item.setTextAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.setItem(row_position, 0, file_name_item)
+
+        audio_length_item = QTableWidgetItem(row.audio_length_str)
+        audio_length_item.setTextAlignment(
+            Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignHCenter
+        )
+        self.setItem(row_position, 1, audio_length_item)
+
+        score_item = QTableWidgetItem(row.formatted_score)
+        score_item.setTextAlignment(
+            Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignHCenter
+        )
+        self.setItem(row_position, 2, score_item)
 
         self.setCellWidget(row_position, 3, self._create_actions(row_position))
 
@@ -67,7 +83,13 @@ class ContentTable(QTableWidget):
             return
 
         # TODO: implement text grid path
-        generate_praat_score(row_data.path, row_data.text_grid_path)
+        row_data.score = generate_praat_score(row_data.path, row_data.text_grid_path)
+        self._update_score(row_position)
+
+    def _update_score(self, row_index: int) -> None:
+        self.setItem(
+            row_index, 2, QTableWidgetItem(self.data[row_index].formatted_score)
+        )
 
     def _create_actions(self, row_position: int) -> QWidget:
         button_widget = QWidget()
@@ -110,8 +132,7 @@ class ContentTable(QTableWidget):
         self.data.pop(row_index)
 
     def open_info(self, row_index: int) -> None:
-        # TODO: implement open info pop up
-        pass
+        self.popup.update_content(self.data[row_index]).show()
 
     def judge_score(self, row_index: int) -> None:
         if self._create_reanalyze_confirmation(self._check_if_analyzed(row_index)):

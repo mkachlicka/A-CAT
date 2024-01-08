@@ -25,7 +25,7 @@ class AudioFileInfo:
 
     @property
     def file_name(self) -> str:
-        return self.path.stem
+        return self.path.name
 
     @property
     def audio_length(self) -> float:
@@ -58,3 +58,7 @@ class AudioFileInfo:
         if self.nativelikeness:
             return f"{self.nativelikeness:.2f}"
         return "N/A"
+
+    @property
+    def formatted_score(self) -> str:
+        return f"{self.comprehensibility_str} | {self.nativelikeness_str}"
