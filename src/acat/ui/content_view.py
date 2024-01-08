@@ -1,4 +1,6 @@
-from functools import partial
+from __future__ import annotations
+
+import weakref
 from typing import Callable, Iterable, List
 
 from PyQt6.QtCore import Qt
@@ -53,7 +55,7 @@ class ContentTable(QTableWidget):
         )
         self.setItem(row_position, 2, score_item)
 
-        self.setCellWidget(row_position, 3, self._create_actions(row_position))
+        self.setCellWidget(row_position, 3, self._create_actions())
 
         self.data.append(row)
 
@@ -91,20 +93,26 @@ class ContentTable(QTableWidget):
             row_index, 2, QTableWidgetItem(self.data[row_index].formatted_score)
         )
 
-    def _create_actions(self, row_position: int) -> QWidget:
+    def _create_actions(self) -> QWidget:
         button_widget = QWidget()
         button_layout = QHBoxLayout()
         button_layout.setContentsMargins(0, 0, 0, 0)
         button_layout.setSpacing(5)
 
         judge_score_button = QPushButton("Judge")
-        judge_score_button.clicked.connect(self._gen_judge_score_handle(row_position))
+        judge_score_button.clicked.connect(
+            self._gen_handle("judge_score", weakref.ref(button_widget))
+        )
 
         open_file_info_button = QPushButton("Info")
-        open_file_info_button.clicked.connect(self._gen_open_info_handle(row_position))
+        open_file_info_button.clicked.connect(
+            self._gen_handle("open_info", weakref.ref(button_widget))
+        )
 
         del_row_button = QPushButton("Delete")
-        del_row_button.clicked.connect(self._gen_delete_row_handle(row_position))
+        del_row_button.clicked.connect(
+            self._gen_handle("delete_row", weakref.ref(button_widget))
+        )
 
         button_layout.addWidget(judge_score_button)
         button_layout.addWidget(open_file_info_button)
@@ -118,14 +126,22 @@ class ContentTable(QTableWidget):
         for row in rows:
             self.add_row(row)
 
-    def _gen_open_info_handle(self, row_index: int) -> Callable:
-        return partial(self.open_info, row_index)
+    def _gen_handle(
+        self, handle_name: str, action_widget: weakref.ReferenceType[QWidget]
+    ) -> Callable:
+        def _inner() -> None:
+            row_index = self._find_row_index(action_widget())
+            getattr(self, handle_name)(row_index)
 
-    def _gen_judge_score_handle(self, row_index: int) -> Callable:
-        return partial(self.judge_score, row_index)
+        return _inner
 
-    def _gen_delete_row_handle(self, row_index: int) -> Callable:
-        return partial(self.delete_row, row_index)
+    def _find_row_index(self, widget: QWidget | None) -> int:
+        if widget is None:
+            return -1
+
+        for row_index in range(self.rowCount()):
+            if self.cellWidget(row_index, 3) == widget:
+                return row_index
 
     def delete_row(self, row_index: int) -> None:
         self.removeRow(row_index)
