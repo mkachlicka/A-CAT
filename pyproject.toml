@@ -5,6 +5,10 @@ description = ""
 authors = ["Heyuan Zeng <hi@universe.observer>"]
 readme = "README.md"
 
+[tool.poetry.scripts]
+acat = "acat.__main__:main"
+build = "acat.pyinstaller:install"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
