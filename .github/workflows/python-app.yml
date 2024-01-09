@@ -76,7 +76,7 @@ jobs:
       run: |
         poetry run acat-build
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }}-${{ matrix.python-version }}-dist
         path: dist
