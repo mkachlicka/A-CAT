@@ -1,0 +1,58 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on:
+  push:
+    branches: [ "main" ]
+    paths: 
+      - src/**
+      - tests/**
+      - poetry.lock
+      - pyproject.toml
+  pull_request:
+    branches: [ "main" ]
+    paths: 
+      - src/**
+      - tests/**
+      - poetry.lock
+      - pyproject.toml
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install poetry
+      run: |
+        curl -O -sSL https://install.python-poetry.org/install-poetry.py
+        python install-poetry.py -y 
+        echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
+        rm install-poetry.py
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'poetry'
+    - name: Install dependencies
+      run: |
+        poetry env use ${{ matrix.python-version }}
+        poetry install
+    - name: Print python versions
+      run: |
+        python -V
+        poetry run python -V
+    - name: Build App
+      run: |
+        poetry run acat-build
+
