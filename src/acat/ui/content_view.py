@@ -20,7 +20,8 @@ from acat.ui.result_popup import ResultPopup
 
 
 class ContentTable(QTableWidget):
-    COL_HEADERS = ["File Name", "Audio Length", "Score", "Actions"]
+    COL_HEADERS = ["File Name", "Audio Length", "Comp Score", "Nat Score", "Actions"]
+    ACTION_COL = 4
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -30,7 +31,7 @@ class ContentTable(QTableWidget):
     def _setup_list(self) -> None:
         self.setColumnCount(len(self.COL_HEADERS))
         self.setHorizontalHeaderLabels(self.COL_HEADERS)
-        self.setColumnWidth(3, 200)
+        self.setColumnWidth(self.ACTION_COL, 200)
 
         self.popup = ResultPopup()
 
@@ -49,13 +50,19 @@ class ContentTable(QTableWidget):
         )
         self.setItem(row_position, 1, audio_length_item)
 
-        score_item = QTableWidgetItem(row.formatted_score)
+        score_item = QTableWidgetItem(row.comprehensibility_str)
         score_item.setTextAlignment(
             Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignHCenter
         )
         self.setItem(row_position, 2, score_item)
 
-        self.setCellWidget(row_position, 3, self._create_actions())
+        score_item = QTableWidgetItem(row.nativelikeness_str)
+        score_item.setTextAlignment(
+            Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignHCenter
+        )
+        self.setItem(row_position, 3, score_item)
+
+        self.setCellWidget(row_position, 4, self._create_actions())
 
         self.data.append(row)
 
@@ -90,7 +97,10 @@ class ContentTable(QTableWidget):
 
     def _update_score(self, row_index: int) -> None:
         self.setItem(
-            row_index, 2, QTableWidgetItem(self.data[row_index].formatted_score)
+            row_index, 2, QTableWidgetItem(self.data[row_index].comprehensibility_str)
+        )
+        self.setItem(
+            row_index, 3, QTableWidgetItem(self.data[row_index].nativelikeness_str)
         )
 
     def _create_actions(self) -> QWidget:
@@ -140,7 +150,7 @@ class ContentTable(QTableWidget):
             return -1
 
         for row_index in range(self.rowCount()):
-            if self.cellWidget(row_index, 3) == widget:
+            if self.cellWidget(row_index, self.ACTION_COL) is widget:
                 return row_index
 
     def delete_row(self, row_index: int) -> None:
