@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.10"]
+        python-version: ["3.11"]
         os:
           - macos-latest
           - ubuntu-latest
@@ -57,6 +57,7 @@ jobs:
         $path = "$env:USERPROFILE\AppData\Roaming\Python\Scripts"
         echo "$path" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Install ninja-build tool
+      if: matrix.os == 'windows-latest'
       uses: seanmiddleditch/gha-setup-ninja@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
@@ -74,4 +75,9 @@ jobs:
     - name: Build App
       run: |
         poetry run acat-build
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}-${{ matrix.python-version }}-dist
+        path: dist
 

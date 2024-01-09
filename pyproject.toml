@@ -40,7 +40,7 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.13"
+python = ">=3.11,<3.13"
 praat-parselmouth = "^0.4.3"
 praatio = "^6.1.0"
 pyqt6 = "^6.6.0"
