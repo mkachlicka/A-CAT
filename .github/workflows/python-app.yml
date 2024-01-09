@@ -52,7 +52,7 @@ jobs:
       run: echo "${HOME}/.poetry/bin:${PATH}" >> $GITHUB_PATH
     - name: Set up poetry for Windows
       if: matrix.os == 'windows-latest'
-      run: echo echo "$env:USERPROFILE\AppData\Roaming\Python\Scripts" >> $GITHUB_PATH
+      run: echo "$env:USERPROFILE\AppData\Roaming\Python\Scripts" >> $GITHUB_PATH
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
