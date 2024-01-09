@@ -43,8 +43,16 @@ jobs:
       run: |
         curl -O -sSL https://install.python-poetry.org/install-poetry.py
         python install-poetry.py -y 
-        echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
         rm install-poetry.py
+    - name: Set up poetry for macOS
+      if: matrix.os == 'macos-latest'
+      run: echo "${HOME}/.local/bin:$PATH" >> $GITHUB_PATH
+    - name: Set up poetry for Ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      run: echo "${HOME}/.poetry/bin:${PATH}" >> $GITHUB_PATH
+    - name: Set up poetry for Windows
+      if: matrix.os == 'windows-latest'
+      run: echo echo "$env:USERPROFILE\AppData\Roaming\Python\Scripts" >> $GITHUB_PATH
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
