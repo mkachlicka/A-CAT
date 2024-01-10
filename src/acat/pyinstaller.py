@@ -16,9 +16,5 @@ def build_test():
             "-y",
             "--log-level=DEBUG",
             "--clean",
-            "--hidden-import PyQt6",
-            "--hidden-import PyQt6.QtCore",
-            "--hidden-import PyQt6.QtWidgets",
-            "--hidden-import PyQt6.QtGui",
         ]
     )
