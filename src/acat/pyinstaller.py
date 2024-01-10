@@ -6,7 +6,7 @@ HERE = Path(__file__).parent.absolute()
 path_to_main = str(HERE / "__main__.py")
 
 
-def install():
+def build_test():
     PyInstaller.__main__.run(
         [
             path_to_main,
@@ -14,5 +14,11 @@ def install():
             "--windowed",
             "--onedir",
             "-y",
+            "--log-level=DEBUG",
+            "--clean",
+            "--hidden-import PyQt6",
+            "--hidden-import PyQt6.QtCore",
+            "--hidden-import PyQt6.QtWidgets",
+            "--hidden-import PyQt6.QtGui",
         ]
     )

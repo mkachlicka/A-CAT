@@ -74,10 +74,10 @@ jobs:
         poetry run python -V
     - name: Build App
       run: |
-        poetry run acat-build
+        poetry run acat-test-build
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.os }}-${{ matrix.python-version }}-dist
+        name: ${{ matrix.os }}-${{ matrix.python-version }}-test-dist
         path: dist
 

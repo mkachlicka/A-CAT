@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.scripts]
 acat = "acat.__main__:main"
-acat-build = "acat.pyinstaller:install"
+acat-test-build = "acat.pyinstaller:build_test"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -46,6 +46,7 @@ praatio = "^6.1.0"
 pyqt6 = "^6.6.0"
 pydub = "^0.25.1"
 pandas = "^2.1.4"
+jinja2 = "^3.1.2"
 
 
 [tool.poetry.group.dev.dependencies]
