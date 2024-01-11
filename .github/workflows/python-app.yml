@@ -80,7 +80,7 @@ jobs:
         poetry run python -V
     - name: Build App
       run: |
-        poetry run acat-test-build
+        poetry run ./test-build.sh
     - name: Zip dist folder on Unix
       if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest' || matrix.os == 'self-hosted'
       run: |
