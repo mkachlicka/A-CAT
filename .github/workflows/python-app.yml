@@ -75,9 +75,15 @@ jobs:
     - name: Build App
       run: |
         poetry run acat-test-build
+    - name: Zip dist folder
+      run: |
+        if [ "${{ runner.os }}" = "Linux" ] || [ "${{ runner.os }}" = "macOS" ]; then
+          zip -r dist.zip dist/
+        elif [ "${{ runner.os }}" = "Windows" ]; then
+          Compress-Archive -Path dist -DestinationPath dist.zip
+        fi
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }}-${{ matrix.python-version }}-test-dist
-        path: dist
-
+        path: dist.zip
