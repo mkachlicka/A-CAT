@@ -33,9 +33,7 @@ jobs:
       matrix:
         python-version: ["3.11"]
         os:
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
+          - self-hosted
 
     steps:
     - uses: actions/checkout@v3
