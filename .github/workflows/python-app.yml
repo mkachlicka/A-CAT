@@ -61,9 +61,15 @@ jobs:
       uses: seanmiddleditch/gha-setup-ninja@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      if: matrix.os != 'self-hosted'
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'poetry'
+    - name: Set up Python ${{ matrix.python-version }} for self-hosted
+      if: matrix.os == 'self-hosted'
+      run: | 
+        pyenv install ${{ matrix.python-version }} -s
+        pyenv global ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
         poetry env use ${{ matrix.python-version }}
@@ -76,9 +82,9 @@ jobs:
       run: |
         poetry run acat-test-build
     - name: Zip dist folder on Unix
-      if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest' || matrix.os == 'self-hosted'
       run: |
-          zip -r dist.zip dist/
+          zip -ry dist.zip dist
     - name: Zip dist folder on Windows
       if: matrix.os == 'windows-latest'
       run: |
