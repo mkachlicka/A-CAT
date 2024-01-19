@@ -1,5 +1,4 @@
 import io
-import math
 import pathlib
 from pathlib import Path
 from typing import Tuple
@@ -97,15 +96,9 @@ def _analysis_from_praat_script(
     )
 
     true_data_sub["rangef0"] = true_data_sub["maxf0"] - true_data_sub["minf0"]
-    true_data_sub["coeff1"] = math.log10(
-        true_data_sub["sdf1"] / true_data_sub["meanf1"]
-    )
-    true_data_sub["coeff2"] = math.log10(
-        true_data_sub["sdf2"] / true_data_sub["meanf2"]
-    )
-    true_data_sub["coeff3"] = math.log10(
-        true_data_sub["sdf3"] / true_data_sub["meanf3"]
-    )
+    true_data_sub["coeff1"] = np.log10(true_data_sub["sdf1"] / true_data_sub["meanf1"])
+    true_data_sub["coeff2"] = np.log10(true_data_sub["sdf2"] / true_data_sub["meanf2"])
+    true_data_sub["coeff3"] = np.log10(true_data_sub["sdf3"] / true_data_sub["meanf3"])
     true_data_sub = true_data_sub[["rangef0", "coeff1", "coeff2", "coeff3"]]
 
     false_data.columns = false_data.columns.str.strip()
@@ -149,7 +142,7 @@ def _analyze_text_grid(text_grid_path: pathlib.Path) -> pd.DataFrame:
     textgrid_df.replace("--undefined--", np.nan, inplace=True)
 
     df_sub = pd.DataFrame(
-        {"sdsylldur": math.log10(textgrid_df["diff"].std(skipna=True))}, index=[0]
+        {"sdsylldur": np.log10(textgrid_df["diff"].std(skipna=True))}, index=[0]
     )
 
     return df_sub
