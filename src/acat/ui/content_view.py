@@ -91,8 +91,7 @@ class ContentTable(QTableWidget):
             )
             return
 
-        # TODO: implement text grid path
-        row_data.score = generate_praat_score(row_data.path, row_data.text_grid_path)
+        row_data.score = generate_praat_score(row_data.path)
         self._update_score(row_position)
 
     def _update_score(self, row_index: int) -> None:

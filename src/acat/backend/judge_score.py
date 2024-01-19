@@ -20,8 +20,17 @@ _ANALYSIS_PRAAT_SCRIPT_STR = str(_ANALYSIS_PRAAT_SCRIPT.absolute())
 print(_ANALYSIS_PRAAT_SCRIPT_STR, _ANALYSIS_PRAAT_SCRIPT.exists())
 
 
+def _generate_file_spec(audio_file_path: Path) -> str:
+    # TODO: change this to a more restrictive file spec
+    return f"{str(audio_file_path.absolute())}*"
+
+
+def _get_text_grid_path(audio_file_path: Path) -> Path:
+    return audio_file_path.absolute().with_suffix(".auto.TextGrid")
+
+
 def _run_praat_script(audio_file_path: Path) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    audio_file_path_str = str(audio_file_path.absolute())
+    audio_file_path_str = _generate_file_spec(audio_file_path)
     tab1 = parselmouth.praat.run_file(
         _ANALYSIS_PRAAT_SCRIPT_STR,
         audio_file_path_str,
@@ -58,7 +67,7 @@ def _run_praat_script(audio_file_path: Path) -> Tuple[pd.DataFrame, pd.DataFrame
 
 
 def _analysis_from_praat_script(
-    audio_file_path: Path
+    audio_file_path: Path,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     true_data, false_data = _run_praat_script(audio_file_path)
 
@@ -136,11 +145,9 @@ def _analyze_text_grid(text_grid_path: pathlib.Path) -> pd.DataFrame:
     return df_sub
 
 
-def generate_praat_score(
-    audio_file_path: pathlib.Path, text_grid_path: pathlib.Path
-) -> PraatScore:
+def generate_praat_score(audio_file_path: pathlib.Path) -> PraatScore:
     df1, df2 = _analysis_from_praat_script(audio_file_path)
-    df3 = _analyze_text_grid(text_grid_path)
+    df3 = _analyze_text_grid(_get_text_grid_path(audio_file_path))
     final = pd.concat([df2, df3, df1], axis=1)
 
     comp_avg = (
