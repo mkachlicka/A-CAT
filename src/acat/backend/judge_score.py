@@ -74,7 +74,9 @@ def _analysis_from_praat_script(
     selected_cols = ["type", "F0", "F1", "F2", "F3"]
     true_data = true_data[selected_cols]
 
-    true_data = true_data[true_data["type"] == "syll"]
+    # TODO: this is a temporary fix. To be confirmed this is the right way to do it.
+    true_data = true_data[true_data["type"] == "?"]  # syll are labeled as ?
+
     true_data.replace("--undefined--", np.nan, inplace=True)
     true_data = true_data.astype({"F0": float, "F1": float, "F2": float, "F3": float})
 
@@ -116,7 +118,11 @@ def _analysis_from_praat_script(
 
 def _analyze_text_grid(text_grid_path: pathlib.Path) -> pd.DataFrame:
     text_grid_path_str = str(text_grid_path.absolute())
-    tg = textgrid.openTextgrid(text_grid_path_str, includeEmptyIntervals=False)
+
+    # TODO: this is a temporary fix. To be confirmed this is the right way to do it.
+    # syll are labeled as ""
+    tg = textgrid.openTextgrid(text_grid_path_str, includeEmptyIntervals=True)
+
     tier = tg.getTier(tg.tierNames[2])
 
     start_times = []
@@ -135,7 +141,11 @@ def _analyze_text_grid(text_grid_path: pathlib.Path) -> pd.DataFrame:
         columns=["start", "stop", "type", "diff"],
     )
     textgrid_df = textgrid_df.astype({"start": float, "stop": float, "diff": float})
-    textgrid_df = textgrid_df[textgrid_df["type"] == "syll"]
+
+    # TODO: this is a temporary fix. To be confirmed this is the right way to do it.
+    textgrid_df = textgrid_df[
+        (textgrid_df["type"] == "syll") | (textgrid_df["type"] == "")
+    ]  # syll are labeled as ""
     textgrid_df.replace("--undefined--", np.nan, inplace=True)
 
     df_sub = pd.DataFrame(
