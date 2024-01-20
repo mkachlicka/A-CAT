@@ -17,6 +17,7 @@ from PyQt6.QtWidgets import (
 from acat.backend.judge_score import generate_praat_score
 from acat.ui.audio_file import AudioFileInfo
 from acat.ui.result_popup import ResultPopup
+from acat.ui.window_management import get_main_window
 
 
 class ContentTable(QTableWidget):
@@ -157,7 +158,7 @@ class ContentTable(QTableWidget):
         self.data.pop(row_index)
 
     def open_info(self, row_index: int) -> None:
-        self.popup.update_content(self.data[row_index]).show()
+        get_main_window().show_window(self.popup.update_content(self.data[row_index]))
 
     def judge_score(self, row_index: int) -> None:
         if self._create_reanalyze_confirmation(self._check_if_analyzed(row_index)):
