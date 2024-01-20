@@ -1,6 +1,8 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
+from acat.ui.rubrics import make_rubrics
+
 
 class HelpWindow(QWidget):
     def __init__(self):
@@ -12,10 +14,12 @@ class HelpWindow(QWidget):
 
         layout = QVBoxLayout()
         # Heading
-        heading = QLabel("<h2>Automated Comprehensibility Assessment Tool Usage</h2>")
+        heading = QLabel("<h1>Automated Comprehensibility Assessment Tool</h1>")
         layout.addWidget(heading)
 
         # Bullet Points
+        instruction = QLabel("<h2>Usage Instructions</h2>")
+        layout.addWidget(instruction)
         bullet_points = QLabel(
             """
                     <ul>
@@ -35,5 +39,8 @@ class HelpWindow(QWidget):
         )
         hyperlink_paragraph.setOpenExternalLinks(True)
         layout.addWidget(hyperlink_paragraph)
+
+        # Rubrics
+        make_rubrics(layout)
 
         self.setLayout(layout)
