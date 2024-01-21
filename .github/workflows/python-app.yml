@@ -89,7 +89,7 @@ jobs:
       env:
         _ACAT_FFMPEG_PATH: ${{ steps.setup-ffmpeg.outputs.ffmpeg-path }}
       run: |
-        poetry run python -c "import build_script; build_script.test_build()"
+        poetry run python -c "import build_script; build_script.test_build('WARN')"
     - name: Zip dist folder on Unix
       if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest' || matrix.os == 'self-hosted'
       run: |
