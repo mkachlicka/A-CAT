@@ -1,4 +1,4 @@
-from acat.ui import main
+from acat.main import main
 
 if __name__ == "__main__":
     main()

@@ -39,6 +39,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - uses: FedericoCarboni/setup-ffmpeg@v3
+      id: setup-ffmpeg
+      with:
+        ffmpeg-version: release
     - name: Install poetry
       run: |
         curl -O -sSL https://install.python-poetry.org/install-poetry.py
@@ -79,6 +83,8 @@ jobs:
         python -V
         poetry run python -V
     - name: Build App
+      env:
+        _ACAT_FFMPEG_PATH: ${{ steps.setup-ffmpeg.outputs.ffmpeg-path }}
       run: |
         poetry run python -c "import build_script; build_script.test_build()"
     - name: Zip dist folder on Unix

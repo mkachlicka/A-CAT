@@ -1,5 +1,6 @@
 import pathlib
 
+import pandas as pd
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QFileDialog, QMainWindow, QWidget
 
@@ -56,11 +57,43 @@ class MainWindow(QMainWindow):
         self._evaluate_all_action.triggered.connect(self._judge_all_rows)
 
         self._export_action = QAction("&Export", self)
+        self._export_action.triggered.connect(self._export_to_csv)
 
         self._help_action = QAction("&Help", self)
         self._help_action.triggered.connect(self._show_help_window)
 
         self._load_sample_audio = QAction("&Load Sample", self)
+
+    def _export_results_as_df(self) -> pd.DataFrame:
+        data = []
+        for audio_file in self._content_view.table.data:
+            file_name = audio_file.file_name
+            file_path = str(audio_file.path)
+            comprehensibility = (
+                audio_file.score.comprehensibility if audio_file.score else None
+            )
+            nativelikeness = (
+                audio_file.score.nativelikeness if audio_file.score else None
+            )
+            data.append([file_name, file_path, comprehensibility, nativelikeness])
+
+        df = pd.DataFrame(
+            data,
+            columns=[
+                "File Name",
+                "File Path",
+                "Comprehensibility Score",
+                "Nativelikeness Score",
+            ],
+        )
+        return df
+
+    def _export_to_csv(self) -> None:
+        df = self._export_results_as_df()
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Save File", "", "CSV Files (*.csv);;All Files (*)"
+        )
+        df.to_csv(file_path, index=False)
 
     def _choose_file(self) -> None:
         files, _ = QFileDialog.getOpenFileNames(

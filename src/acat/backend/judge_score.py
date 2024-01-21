@@ -8,15 +8,14 @@ import pandas as pd
 import parselmouth
 from praatio import textgrid
 
+from acat.backend.utils import get_praat_func_dir
 from acat.ui.audio_file import PraatScore
 
-_SUPPORT_PATH = Path(__file__).parent / "support"
-_SUPPORT_FUNC_PATH = _SUPPORT_PATH / "functions"
-
-_ANALYSIS_PRAAT_SCRIPT = _SUPPORT_FUNC_PATH / "SyllableNucleiv3.praat"
+_ANALYSIS_PRAAT_SCRIPT = get_praat_func_dir() / "SyllableNucleiv3.praat"
 _ANALYSIS_PRAAT_SCRIPT_STR = str(_ANALYSIS_PRAAT_SCRIPT.absolute())
 
-print(_ANALYSIS_PRAAT_SCRIPT_STR, _ANALYSIS_PRAAT_SCRIPT.exists())
+with open(_ANALYSIS_PRAAT_SCRIPT_STR, "rb") as f:
+    f.read()
 
 
 def _generate_file_spec(audio_file_path: Path) -> str:

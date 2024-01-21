@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import traceback
 import weakref
-from typing import Callable, Iterable, List
+from typing import Callable, Iterable, List, Tuple
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QMessageBox,
@@ -20,6 +21,37 @@ from acat.ui.result_popup import ResultPopup
 from acat.ui.window_management import get_main_window
 
 
+class WorkerSignals(QObject):
+    finished = pyqtSignal(int, str)
+
+
+class RowWorker(QRunnable):
+    def __init__(
+        self, row_index: int, data: weakref.ReferenceType[AudioFileInfo]
+    ) -> None:
+        super().__init__()
+        self.row_index = row_index
+        self.data = data
+        self.signal = WorkerSignals()
+
+    def run(self):
+        data: AudioFileInfo = self.data()
+        if data is None:
+            return
+
+        try:
+            data.score = generate_praat_score(data.path)
+        except Exception as e:
+            QMessageBox.critical(
+                None,
+                "Error",
+                "An error occurred while analyzing the audio file. Please notify the developer.",
+            )
+            raise RuntimeError from e
+
+        self.signal.finished.emit(self.row_index, str(data.path))
+
+
 class ContentTable(QTableWidget):
     COL_HEADERS = ["File Name", "Audio Length", "Comp Score", "Nat Score", "Actions"]
     ACTION_COL = 4
@@ -28,6 +60,9 @@ class ContentTable(QTableWidget):
         super().__init__(parent)
         self.data: List[AudioFileInfo] = []
         self._setup_list()
+        self._threads = QThreadPool(self)
+        self._threads.setMaxThreadCount(8)
+        self._selected: Tuple[int, str] | None = None
 
     def _setup_list(self) -> None:
         self.setColumnCount(len(self.COL_HEADERS))
@@ -68,13 +103,7 @@ class ContentTable(QTableWidget):
         self.data.append(row)
 
     def _judge_row(self, row_position: int) -> None:
-        try:
-            row_data = self.data[row_position]
-        except IndexError:
-            QMessageBox.critical(
-                self, "Error", "This is an internal error. Please notify the developer."
-            )
-            return
+        row_data = self.get_row(row_position, notify=True)
 
         if not row_data.path.exists():
             QMessageBox.critical(
@@ -92,16 +121,23 @@ class ContentTable(QTableWidget):
             )
             return
 
-        row_data.score = generate_praat_score(row_data.path)
-        self._update_score(row_position)
+        thread = RowWorker(row_position, weakref.ref(row_data))
+        thread.signal.finished.connect(self._update_score)
 
-    def _update_score(self, row_index: int) -> None:
-        self.setItem(
-            row_index, 2, QTableWidgetItem(self.data[row_index].comprehensibility_str)
-        )
-        self.setItem(
-            row_index, 3, QTableWidgetItem(self.data[row_index].nativelikeness_str)
-        )
+        self._threads.start(thread)
+
+    def _update_score(self, row_index: int, path: str) -> None:
+        row_data = self.get_row(row_index)
+        if path == str(row_data.path):
+            self.setItem(
+                row_index,
+                2,
+                QTableWidgetItem(row_data.comprehensibility_str),
+            )
+            self.setItem(row_index, 3, QTableWidgetItem(row_data.nativelikeness_str))
+
+            if self._selected == (row_index, path):
+                self.popup.update_content(row_data)
 
     def _create_actions(self) -> QWidget:
         button_widget = QWidget()
@@ -158,7 +194,23 @@ class ContentTable(QTableWidget):
         self.data.pop(row_index)
 
     def open_info(self, row_index: int) -> None:
-        get_main_window().show_window(self.popup.update_content(self.data[row_index]))
+        data = self.get_row(row_index)
+        self._selected = (row_index, str(data.path))
+
+        get_main_window().show_window(self.popup.update_content(data))
+
+    def get_row(self, row_index: int, notify: bool = False) -> AudioFileInfo | None:
+        try:
+            return self.data[row_index]
+        except IndexError as e:
+            if notify:
+                QMessageBox.critical(
+                    self,
+                    "Error",
+                    "This is an internal error. Please notify the developer.\n"
+                    f"{traceback.format_tb(e.__traceback__)}",
+                )
+        return None
 
     def judge_score(self, row_index: int) -> None:
         if self._create_reanalyze_confirmation(self._check_if_analyzed(row_index)):
@@ -195,13 +247,7 @@ class ContentTable(QTableWidget):
                 )
             )
 
-        try:
-            row_to_check = self.data[row_index]
-        except IndexError as e:
-            QMessageBox.critical(
-                self, "Error", "This is an internal error. Please notify the developer."
-            )
-            raise RuntimeError from e
+        row_to_check = self.get_row(row_index, notify=True)
 
         return [row_to_check.file_name] if row_to_check.score is not None else []
 

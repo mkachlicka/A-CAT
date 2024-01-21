@@ -1,10 +1,11 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QLabel, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QLabel, QVBoxLayout
 
 from acat.ui.rubrics import make_rubrics
+from acat.ui.subwindow import SubWindow
 
 
-class HelpWindow(QWidget):
+class HelpWindow(SubWindow):
     def __init__(self):
         super().__init__()
         self.init_ui()
@@ -44,3 +45,10 @@ class HelpWindow(QWidget):
         make_rubrics(layout)
 
         self.setLayout(layout)
+
+    def keyPressEvent(self, event):
+        if (
+            event.key() == Qt.Key.Key_W
+            and event.modifiers() == Qt.KeyboardModifier.ControlModifier
+        ):
+            self.close()

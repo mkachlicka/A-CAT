@@ -1,12 +1,13 @@
 from typing import Self
 
-from PyQt6.QtWidgets import QLabel, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QLabel, QVBoxLayout
 
 from acat.ui.audio_file import AudioFileInfo
 from acat.ui.rubrics import make_rubrics
+from acat.ui.subwindow import SubWindow
 
 
-class ResultPopup(QWidget):
+class ResultPopup(SubWindow):
     def __init__(self):
         super().__init__()
         self.layout = QVBoxLayout(self)

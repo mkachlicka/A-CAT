@@ -14,7 +14,7 @@ class PraatScore(NamedTuple):
 class AudioFileInfo:
     path: pathlib.Path
     score: PraatScore | None = field(default=None)
-    audio: str | None = field(default=None, init=False)
+    audio: AudioSegment | None = field(default=None, init=False)
 
     def __post_init__(self) -> None:
         self.audio = AudioSegment.from_file(self.path)
@@ -50,13 +50,13 @@ class AudioFileInfo:
     @property
     def comprehensibility_str(self) -> str:
         if self.comprehensibility:
-            return f"{self.comprehensibility:.2f}"
+            return f"{self.comprehensibility:.4f}"
         return "N/A"
 
     @property
     def nativelikeness_str(self) -> str:
         if self.nativelikeness:
-            return f"{self.nativelikeness:.2f}"
+            return f"{self.nativelikeness:.4f}"
         return "N/A"
 
     @property
