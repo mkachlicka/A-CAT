@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import traceback
 import weakref
-from typing import Callable, Iterable, List, Tuple
+from typing import Callable, Iterable, List
 
-from PyQt6.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal
+from PyQt6.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal, pyqtSlot
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QMessageBox,
@@ -22,7 +22,7 @@ from acat.ui.window_management import get_main_window
 
 
 class WorkerSignals(QObject):
-    finished = pyqtSignal(int, str)
+    finished = pyqtSignal(int, object)
 
 
 class RowWorker(QRunnable):
@@ -34,6 +34,7 @@ class RowWorker(QRunnable):
         self.data = data
         self.signal = WorkerSignals()
 
+    @pyqtSlot()
     def run(self):
         data: AudioFileInfo = self.data()
         if data is None:
@@ -49,7 +50,7 @@ class RowWorker(QRunnable):
             )
             raise RuntimeError from e
 
-        self.signal.finished.emit(self.row_index, str(data.path))
+        self.signal.finished.emit(self.row_index, data)
 
 
 class ContentTable(QTableWidget):
@@ -60,9 +61,9 @@ class ContentTable(QTableWidget):
         super().__init__(parent)
         self.data: List[AudioFileInfo] = []
         self._setup_list()
-        self._threads = QThreadPool(self)
-        self._threads.setMaxThreadCount(8)
-        self._selected: Tuple[int, str] | None = None
+        self._threads = QThreadPool()
+        self._threads.setMaxThreadCount(16)
+        self._selected: weakref.ReferenceType[AudioFileInfo] | None = None
 
     def _setup_list(self) -> None:
         self.setColumnCount(len(self.COL_HEADERS))
@@ -126,9 +127,9 @@ class ContentTable(QTableWidget):
 
         self._threads.start(thread)
 
-    def _update_score(self, row_index: int, path: str) -> None:
+    def _update_score(self, row_index: int, data: AudioFileInfo) -> None:
         row_data = self.get_row(row_index)
-        if path == str(row_data.path):
+        if row_data is data:
             self.setItem(
                 row_index,
                 2,
@@ -136,7 +137,7 @@ class ContentTable(QTableWidget):
             )
             self.setItem(row_index, 3, QTableWidgetItem(row_data.nativelikeness_str))
 
-            if self._selected == (row_index, path):
+            if self._selected and self._selected() == data:
                 self.popup.update_content(row_data)
 
     def _create_actions(self) -> QWidget:
@@ -195,7 +196,7 @@ class ContentTable(QTableWidget):
 
     def open_info(self, row_index: int) -> None:
         data = self.get_row(row_index)
-        self._selected = (row_index, str(data.path))
+        self._selected = weakref.ref(data)
 
         get_main_window().show_window(self.popup.update_content(data))
 
