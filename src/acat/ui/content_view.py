@@ -4,7 +4,14 @@ import traceback
 import weakref
 from typing import Callable, Iterable, List
 
-from PyQt6.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal, pyqtSlot
+from PyQt6.QtCore import (
+    QObject,
+    QRunnable,
+    Qt,
+    QThreadPool,
+    pyqtSignal,
+    pyqtSlot,
+)
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QMessageBox,
@@ -61,8 +68,8 @@ class ContentTable(QTableWidget):
         super().__init__(parent)
         self.data: List[AudioFileInfo] = []
         self._setup_list()
-        self._threads = QThreadPool()
-        self._threads.setMaxThreadCount(16)
+        self._thread_pool = QThreadPool()
+        self._threads = []
         self._selected: weakref.ReferenceType[AudioFileInfo] | None = None
 
     def _setup_list(self) -> None:
@@ -124,8 +131,7 @@ class ContentTable(QTableWidget):
 
         thread = RowWorker(row_position, weakref.ref(row_data))
         thread.signal.finished.connect(self._update_score)
-
-        self._threads.start(thread)
+        self._thread_pool.start(thread)
 
     def _update_score(self, row_index: int, data: AudioFileInfo) -> None:
         row_data = self.get_row(row_index)
