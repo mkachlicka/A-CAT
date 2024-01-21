@@ -44,7 +44,7 @@ def _ffmpeg_resource_path() -> Generator[str, None, None]:
         yield f"--add-binary={ffmpeg_path}:bin/"
 
 
-def test_build():
+def test_build(log_level: str = "DEBUG"):
     PyInstaller.__main__.run(
         [
             path_to_main,
@@ -53,8 +53,9 @@ def test_build():
             "--windowed",
             "--onedir",
             "-y",
-            "--log-level=DEBUG",
+            f"--log-level={log_level}",
             "--clean",
+            "--icon=ACAT_ICON.png",
             *_praat_resource_path(),
             *_ffmpeg_resource_path(),
         ]
