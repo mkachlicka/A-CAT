@@ -89,11 +89,12 @@ class MainWindow(QMainWindow):
         return df
 
     def _export_to_csv(self) -> None:
-        df = self._export_results_as_df()
         file_path, _ = QFileDialog.getSaveFileName(
             self, "Save File", "", "CSV Files (*.csv);;All Files (*)"
         )
-        df.to_csv(file_path, index=False)
+        if file_path:
+            df = self._export_results_as_df()
+            df.to_csv(file_path, index=False)
 
     def _choose_file(self) -> None:
         files, _ = QFileDialog.getOpenFileNames(
