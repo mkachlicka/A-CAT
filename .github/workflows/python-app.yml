@@ -98,6 +98,14 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
           Compress-Archive -Path dist -DestinationPath dist.zip
+    - name: Upload a file to Google Drive
+      uses: willo32/google-drive-upload-action@v1
+      with:
+        target: dist.zip
+        credentials: ${{ secrets.GD_KEY }}
+        parent_folder_id: 1s724Lvy80htrI0YLuHerpxKmVWV2eewr
+        child_folder: ${{ matrix.os }}
+        name: ${{ matrix.os }}-${{ matrix.python-version }}-test-dist.zip
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
