@@ -50,8 +50,7 @@ class RowWorker(QRunnable):
         try:
             data.score = generate_praat_score(data.path)
         except Exception as e:
-            QMessageBox.critical(
-                None,
+            print(
                 "Error",
                 "An error occurred while analyzing the audio file. Please notify the developer.",
             )

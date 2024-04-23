@@ -1,13 +1,20 @@
 import pathlib
 from dataclasses import dataclass, field
-from typing import NamedTuple
 
 from pydub import AudioSegment
 
 
-class PraatScore(NamedTuple):
+@dataclass
+class PraatScore:
     comprehensibility: float
     nativelikeness: float
+    speechrate: float
+    pauses: float
+    rangef0: float
+    sdsylldur: float
+    coeff1: float
+    coeff2: float
+    coeff3: float
 
 
 @dataclass

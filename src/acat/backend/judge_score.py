@@ -176,4 +176,14 @@ def generate_praat_score(audio_file_path: pathlib.Path) -> PraatScore:
     )
     native_score = native_avg.iloc[0]
 
-    return PraatScore(comp_score, native_score)
+    return PraatScore(
+        comp_score,
+        native_score,
+        final["speechrate"],
+        final["pauses"],
+        final["rangef0"],
+        final["sdsylldur"],
+        final["coeff1"],
+        final["coeff2"],
+        final["coeff3"],
+    )
