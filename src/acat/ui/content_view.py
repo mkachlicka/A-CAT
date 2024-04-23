@@ -48,7 +48,7 @@ class RowWorker(QRunnable):
             return
 
         try:
-            data.score = generate_praat_score(data.path)
+            data.score = generate_praat_score(data.path, model="japanese")
         except Exception as e:
             print(
                 "Error",

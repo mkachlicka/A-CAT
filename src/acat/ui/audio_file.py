@@ -80,13 +80,13 @@ class AudioFileInfo:
     @property
     def comprehensibility_str(self) -> str:
         if self.comprehensibility:
-            return f"{self.comprehensibility:.4f}"
+            return f"{self.comprehensibility:.5f}"
         return "N/A"
 
     @property
     def nativelikeness_str(self) -> str:
         if self.nativelikeness:
-            return f"{self.nativelikeness:.4f}"
+            return f"{self.nativelikeness:.5f}"
         return "N/A"
 
     @property

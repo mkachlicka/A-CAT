@@ -1,7 +1,7 @@
 import io
 import pathlib
 from pathlib import Path
-from typing import Tuple
+from typing import Literal, Tuple
 
 import numpy as np
 import pandas as pd
@@ -147,7 +147,7 @@ def _analyze_text_grid(text_grid_path: pathlib.Path) -> pd.DataFrame:
     return df_sub
 
 
-def generate_praat_score(audio_file_path: pathlib.Path) -> PraatScore:
+def generate_praat_score_japanese_impl(audio_file_path: pathlib.Path) -> PraatScore:
     df1, df2 = _analysis_from_praat_script(audio_file_path)
     df3 = _analyze_text_grid(_get_text_grid_path(audio_file_path))
     final = pd.concat([df2, df3, df1], axis=1)
@@ -187,3 +187,12 @@ def generate_praat_score(audio_file_path: pathlib.Path) -> PraatScore:
         final["coeff2"],
         final["coeff3"],
     )
+
+
+def generate_praat_score(
+    audio_file_path: pathlib.Path, model: Literal["japanese"] = "japanese"
+) -> PraatScore:
+    if model == "japanese":
+        return generate_praat_score_japanese_impl(audio_file_path)
+    else:
+        raise ValueError("Unknown Language Model")
