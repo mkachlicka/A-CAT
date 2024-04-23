@@ -9,3 +9,5 @@ class SubWindow(QWidget):
             and event.modifiers() == Qt.KeyboardModifier.ControlModifier
         ):
             self.close()
+        elif event.key() == Qt.Key.Key_Escape:
+            self.close()

@@ -29,10 +29,18 @@ from acat.ui.window_management import get_main_window
 
 
 class WorkerSignals(QObject):
+    """A signal object used to passing message between threads"""
+
     finished = pyqtSignal(int, object)
 
 
 class RowWorker(QRunnable):
+    """A worker thread for background processing Praat scores
+
+    The worker thread, when initialized, executes the `run` function,
+    which contains the actual implementation of the running thread
+    """
+
     def __init__(
         self, row_index: int, data: weakref.ReferenceType[AudioFileInfo]
     ) -> None:
@@ -43,11 +51,13 @@ class RowWorker(QRunnable):
 
     @pyqtSlot()
     def run(self):
+        """The actual implementation of the thread, which is judging the praat score"""
         data: AudioFileInfo = self.data()
         if data is None:
             return
 
         try:
+            # chooses which model to run and the path to the audio file
             data.score = generate_praat_score(data.path, model="japanese")
         except Exception as e:
             print(
@@ -56,10 +66,13 @@ class RowWorker(QRunnable):
             )
             raise RuntimeError from e
 
+        # sends the score result back to the UI
         self.signal.finished.emit(self.row_index, data)
 
 
 class ContentTable(QTableWidget):
+    """A content table used for displaying the praat score in the main UI window"""
+
     COL_HEADERS = ["File Name", "Audio Length", "Comp Score", "Nat Score", "Actions"]
     ACTION_COL = 4
 
@@ -259,6 +272,8 @@ class ContentTable(QTableWidget):
 
 
 class ContentView(QWidget):
+    """The main view of the main UI window"""
+
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._setup_ui()

@@ -9,6 +9,8 @@ from pydub import AudioSegment
 
 @dataclass
 class PraatScore:
+    """Scores generated from Praat analysis that will be displayed and export as CSV"""
+
     comprehensibility: float
     nativelikeness: float
     speechrate: float
@@ -21,6 +23,7 @@ class PraatScore:
 
     @property
     def all_data(self) -> Iterable[float]:
+        """Get all data conveniently as a iterable that can be serialized easily"""
         return [
             self.comprehensibility,
             self.nativelikeness,
@@ -35,6 +38,7 @@ class PraatScore:
 
     @staticmethod
     def all_data_or_none(obj: PraatScore | None) -> Iterable[float | None]:
+        """get all data as an iterable or an iterable of None"""
         if obj is None:
             return [None for _ in range(9)]
         return obj.all_data

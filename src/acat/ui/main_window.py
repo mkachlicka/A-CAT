@@ -10,6 +10,8 @@ from acat.ui.help_window import HelpWindow
 
 
 class MainWindow(QMainWindow):
+    """The main UI window of ACAT"""
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -50,6 +52,11 @@ class MainWindow(QMainWindow):
         return self.palette().window().color().lightness() < 128
 
     def _create_actions(self) -> None:
+        """Make the top toolbar of the application
+
+        It creates toolbar button by using QAction
+        and the actions are connected to its functionality by using the `.triggered.connect` function
+        """
         self._choose_action = QAction("&Choose", self)
         self._choose_action.triggered.connect(self._choose_file)
 
@@ -65,7 +72,10 @@ class MainWindow(QMainWindow):
         self._load_sample_audio = QAction("&Load Sample", self)
 
     def _export_results_as_df(self) -> pd.DataFrame:
+        """Export data score as data frame"""
         data = []
+
+        # dump scores into a 2d array
         for audio_file in self._content_view.table.data:
             file_name = audio_file.file_name
             file_path = str(audio_file.path)
@@ -74,6 +84,7 @@ class MainWindow(QMainWindow):
 
             data.append([file_name, file_path, *all_data])
 
+        # make a dara frame for dumping
         df = pd.DataFrame(
             data,
             columns=[
@@ -93,6 +104,7 @@ class MainWindow(QMainWindow):
         return df
 
     def _export_to_csv(self) -> None:
+        """Dump the data into a CSV file"""
         file_path, _ = QFileDialog.getSaveFileName(
             self, "Save File", "", "CSV Files (*.csv);;All Files (*)"
         )
@@ -116,6 +128,7 @@ class MainWindow(QMainWindow):
         self._content_view.table.judge_all_scores()
 
     def _make_toolbar(self) -> None:
+        """Add the made tool bar items into the top toolbar"""
         top_toolbar = self.addToolBar("General Actions")
         top_toolbar.setMovable(False)
         # choose file action

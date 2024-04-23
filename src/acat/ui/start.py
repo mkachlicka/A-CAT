@@ -5,6 +5,7 @@ from acat.ui.window_management import get_main_window, set_main_window
 
 
 def start_application() -> None:
+    """Start the application"""
     app = QApplication([])
 
     set_main_window(MainWindow())

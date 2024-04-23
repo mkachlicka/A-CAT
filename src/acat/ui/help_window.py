@@ -6,6 +6,8 @@ from acat.ui.subwindow import SubWindow
 
 
 class HelpWindow(SubWindow):
+    """The help window shown at the start of the application"""
+
     def __init__(self):
         super().__init__()
         self.init_ui()
@@ -34,21 +36,14 @@ class HelpWindow(SubWindow):
         bullet_points.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(bullet_points)
 
-        # Hyperlink Paragraph
-        hyperlink_paragraph = QLabel(
-            'For more information, please visit <a href="https://link.here">the application website</a>.'
-        )
-        hyperlink_paragraph.setOpenExternalLinks(True)
-        layout.addWidget(hyperlink_paragraph)
+        # Hyperlink Paragraph when the website is ready?
+        # hyperlink_paragraph = QLabel(
+        #     'For more information, please visit <a href="https://link.here">the application website</a>.'
+        # )
+        # hyperlink_paragraph.setOpenExternalLinks(True)
+        # layout.addWidget(hyperlink_paragraph)
 
         # Rubrics
         make_rubrics(layout)
 
         self.setLayout(layout)
-
-    def keyPressEvent(self, event):
-        if (
-            event.key() == Qt.Key.Key_W
-            and event.modifiers() == Qt.KeyboardModifier.ControlModifier
-        ):
-            self.close()

@@ -8,6 +8,8 @@ from acat.ui.subwindow import SubWindow
 
 
 class ResultPopup(SubWindow):
+    """The popup shown when viewing the details of a audio score"""
+
     def __init__(self):
         super().__init__()
         self.layout = QVBoxLayout(self)
