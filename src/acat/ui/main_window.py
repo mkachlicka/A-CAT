@@ -4,7 +4,7 @@ import pandas as pd
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QFileDialog, QMainWindow, QWidget
 
-from acat.ui.audio_file import AudioFileInfo
+from acat.ui.audio_file import AudioFileInfo, PraatScore
 from acat.ui.content_view import ContentView
 from acat.ui.help_window import HelpWindow
 
@@ -69,13 +69,10 @@ class MainWindow(QMainWindow):
         for audio_file in self._content_view.table.data:
             file_name = audio_file.file_name
             file_path = str(audio_file.path)
-            comprehensibility = (
-                audio_file.score.comprehensibility if audio_file.score else None
-            )
-            nativelikeness = (
-                audio_file.score.nativelikeness if audio_file.score else None
-            )
-            data.append([file_name, file_path, comprehensibility, nativelikeness])
+
+            all_data = PraatScore.all_data_or_none(audio_file.score)
+
+            data.append([file_name, file_path, *all_data])
 
         df = pd.DataFrame(
             data,
@@ -84,6 +81,13 @@ class MainWindow(QMainWindow):
                 "File Path",
                 "Comprehensibility Score",
                 "Nativelikeness Score",
+                "speechrate",
+                "pauses",
+                "rangef0",
+                "sdsylldur",
+                "coeff1",
+                "coeff2",
+                "coeff3",
             ],
         )
         return df

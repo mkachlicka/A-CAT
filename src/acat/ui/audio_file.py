@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import pathlib
 from dataclasses import dataclass, field
+from typing import Iterable
 
 from pydub import AudioSegment
 
@@ -15,6 +18,26 @@ class PraatScore:
     coeff1: float
     coeff2: float
     coeff3: float
+
+    @property
+    def all_data(self) -> Iterable[float]:
+        return [
+            self.comprehensibility,
+            self.nativelikeness,
+            self.speechrate,
+            self.pauses,
+            self.rangef0,
+            self.sdsylldur,
+            self.coeff1,
+            self.coeff2,
+            self.coeff3,
+        ]
+
+    @staticmethod
+    def all_data_or_none(obj: PraatScore | None) -> Iterable[float | None]:
+        if obj is None:
+            return [None for _ in range(9)]
+        return obj.all_data
 
 
 @dataclass
