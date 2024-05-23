@@ -22,7 +22,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from acat.backend.judge_score import generate_praat_score
+from acat.backend.judge_score import LanguageModel, generate_praat_score
 from acat.ui.audio_file import AudioFileInfo
 from acat.ui.result_popup import ResultPopup
 from acat.ui.window_management import get_main_window
@@ -42,11 +42,15 @@ class RowWorker(QRunnable):
     """
 
     def __init__(
-        self, row_index: int, data: weakref.ReferenceType[AudioFileInfo]
+        self,
+        row_index: int,
+        data: weakref.ReferenceType[AudioFileInfo],
+        model: LanguageModel,
     ) -> None:
         super().__init__()
         self.row_index = row_index
         self.data = data
+        self.model = model
         self.signal = WorkerSignals()
 
     @pyqtSlot()
@@ -58,7 +62,7 @@ class RowWorker(QRunnable):
 
         try:
             # chooses which model to run and the path to the audio file
-            data.score = generate_praat_score(data.path, model="japanese")
+            data.score = generate_praat_score(data.path, self.model)
         except Exception as e:
             print(
                 "Error",
@@ -78,6 +82,7 @@ class ContentTable(QTableWidget):
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
+        self.parent_wrapper = parent
         self.data: List[AudioFileInfo] = []
         self._setup_list()
         self._thread_pool = QThreadPool()
@@ -122,7 +127,7 @@ class ContentTable(QTableWidget):
 
         self.data.append(row)
 
-    def _judge_row(self, row_position: int) -> None:
+    def _judge_row(self, row_position: int, model: LanguageModel) -> None:
         row_data = self.get_row(row_position, notify=True)
 
         if not row_data.path.exists():
@@ -141,7 +146,7 @@ class ContentTable(QTableWidget):
             )
             return
 
-        thread = RowWorker(row_position, weakref.ref(row_data))
+        thread = RowWorker(row_position, weakref.ref(row_data), model)
         thread.signal.finished.connect(self._update_score)
         self._thread_pool.start(thread)
 
@@ -231,14 +236,20 @@ class ContentTable(QTableWidget):
                 )
         return None
 
-    def judge_score(self, row_index: int) -> None:
-        if self._create_reanalyze_confirmation(self._check_if_analyzed(row_index)):
-            self._judge_row(row_index)
+    def judge_score(self, row_index: int, model: LanguageModel = None) -> None:
+        if model is None:
+            model = get_main_window().get_current_model()
 
-    def judge_all_scores(self) -> None:
+        if self._create_reanalyze_confirmation(self._check_if_analyzed(row_index)):
+            self._judge_row(row_index, model)
+
+    def judge_all_scores(self, model: LanguageModel = None) -> None:
+        if model is None:
+            model = get_main_window().get_current_model()
+
         if self._create_reanalyze_confirmation(self._check_if_analyzed()):
             for row_index in range(len(self.data)):
-                self._judge_row(row_index)
+                self._judge_row(row_index, model)
 
     def _create_reanalyze_confirmation(self, files: List[str]) -> bool:
         if files:

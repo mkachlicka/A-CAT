@@ -2,11 +2,13 @@ import pathlib
 
 import pandas as pd
 from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QFileDialog, QMainWindow, QWidget
+from PyQt6.QtWidgets import QFileDialog, QMainWindow, QWidget, QWidgetAction
 
+from acat.backend.judge_score import LanguageModel
 from acat.ui.audio_file import AudioFileInfo, PraatScore
 from acat.ui.content_view import ContentView
 from acat.ui.help_window import HelpWindow
+from acat.ui.ModelChooser import ModelComboChooser
 
 
 class MainWindow(QMainWindow):
@@ -69,6 +71,11 @@ class MainWindow(QMainWindow):
         self._help_action = QAction("&Help", self)
         self._help_action.triggered.connect(self._show_help_window)
 
+        self._model_box = ModelComboChooser()
+        self._model_choose_action = QAction("&Choose Native Language", self)
+        self._widget_action = QWidgetAction(self)
+        self._widget_action.setDefaultWidget(self._model_box)
+
     def _export_results_as_df(self) -> pd.DataFrame:
         """Export data score as data frame"""
         data = []
@@ -123,7 +130,10 @@ class MainWindow(QMainWindow):
         self._content_view.table.add_rows(file_info)
 
     def _judge_all_rows(self) -> None:
-        self._content_view.table.judge_all_scores()
+        self._content_view.table.judge_all_scores(self.get_current_model())
+
+    def get_current_model(self) -> LanguageModel:
+        return LanguageModel(self._model_box.currentText())
 
     def _make_toolbar(self) -> None:
         """Add the made tool bar items into the top toolbar"""
@@ -145,6 +155,9 @@ class MainWindow(QMainWindow):
         # help action
         top_toolbar.addAction(self._help_action)
         top_toolbar.addSeparator()
+
+        top_toolbar.addAction(self._model_choose_action)
+        top_toolbar.addAction(self._widget_action)
 
     def _make_content(self) -> None:
         self._content_view = ContentView()
