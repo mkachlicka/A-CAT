@@ -67,6 +67,7 @@ class RowWorker(QRunnable):
             print(
                 "Error",
                 "An error occurred while analyzing the audio file. Please notify the developer.",
+                f"Data: {data}",
             )
             raise RuntimeError from e
 
