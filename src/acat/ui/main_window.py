@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
         It creates toolbar button by using QAction
         and the actions are connected to its functionality by using the `.triggered.connect` function
         """
-        self._choose_action = QAction("&Choose", self)
+        self._choose_action = QAction("&Choose Audio", self)
         self._choose_action.triggered.connect(self._choose_file)
 
         self._evaluate_all_action = QAction("&Judge All", self)
@@ -68,8 +68,6 @@ class MainWindow(QMainWindow):
 
         self._help_action = QAction("&Help", self)
         self._help_action.triggered.connect(self._show_help_window)
-
-        self._load_sample_audio = QAction("&Load Sample", self)
 
     def _export_results_as_df(self) -> pd.DataFrame:
         """Export data score as data frame"""
@@ -147,8 +145,6 @@ class MainWindow(QMainWindow):
         # help action
         top_toolbar.addAction(self._help_action)
         top_toolbar.addSeparator()
-        # load sample audio action
-        top_toolbar.addAction(self._load_sample_audio)
 
     def _make_content(self) -> None:
         self._content_view = ContentView()
