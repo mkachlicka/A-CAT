@@ -33,7 +33,7 @@ jobs:
       matrix:
         python-version: [ "3.11" ]
         os:
-          - macos-14
+          - macos-latest-large
           - ubuntu-latest
           - windows-latest
 
