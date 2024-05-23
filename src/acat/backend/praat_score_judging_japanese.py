@@ -176,14 +176,21 @@ def generate_praat_score_japanese_impl(audio_file_path: pathlib.Path) -> PraatSc
     )
     native_score = native_avg.iloc[0]
 
+    partial_data = map(
+        lambda x: x[0],
+        [
+            final["speechrate"],
+            final["pauses"],
+            final["rangef0"],
+            final["sdsylldur"],
+            final["coeff1"],
+            final["coeff2"],
+            final["coeff3"],
+        ],
+    )
+
     return PraatScore(
         comp_score,
         native_score,
-        final["speechrate"],
-        final["pauses"],
-        final["rangef0"],
-        final["sdsylldur"],
-        final["coeff1"],
-        final["coeff2"],
-        final["coeff3"],
+        *partial_data,
     )
