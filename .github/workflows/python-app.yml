@@ -6,7 +6,7 @@ name: Python application
 on:
   push:
     branches: [ "main" ]
-    paths: 
+    paths:
       - src/**
       - tests/**
       - poetry.lock
@@ -14,7 +14,7 @@ on:
       - .github/workflows/python-app.yml
   pull_request:
     branches: [ "main" ]
-    paths: 
+    paths:
       - src/**
       - tests/**
       - poetry.lock
@@ -31,83 +31,83 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11"]
+        python-version: [ "3.11" ]
         os:
           - macos-latest
           - ubuntu-latest
           - windows-latest
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        token: ${{ secrets.GH_PAT }}
-    - uses: FedericoCarboni/setup-ffmpeg@v3
-      id: setup-ffmpeg
-      with:
-        ffmpeg-version: release
-    - name: Install poetry
-      run: |
-        curl -O -sSL https://install.python-poetry.org/install-poetry.py
-        python install-poetry.py -y 
-        rm install-poetry.py
-    - name: Set up poetry for macOS
-      if: matrix.os == 'macos-latest'
-      run: echo "${HOME}/.local/bin:$PATH" >> $GITHUB_PATH
-    - name: Set up poetry for Ubuntu
-      if: matrix.os == 'ubuntu-latest'
-      run: echo "${HOME}/.poetry/bin:${PATH}" >> $GITHUB_PATH
-    - name: Set up poetry for Windows
-      if: matrix.os == 'windows-latest'
-      shell: pwsh
-      run: |
-        $path = "$env:USERPROFILE\AppData\Roaming\Python\Scripts"
-        echo "$path" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-    - name: Install ninja-build tool
-      if: matrix.os == 'windows-latest'
-      uses: seanmiddleditch/gha-setup-ninja@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      if: matrix.os != 'self-hosted'
-      with:
-        python-version: ${{ matrix.python-version }}
-        cache: 'poetry'
-    - name: Set up Python ${{ matrix.python-version }} for self-hosted
-      if: matrix.os == 'self-hosted'
-      run: | 
-        pyenv install ${{ matrix.python-version }} -s
-        pyenv global ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        poetry env use ${{ matrix.python-version }}
-        poetry install
-    - name: Print python versions
-      run: |
-        python -V
-        poetry run python -V
-    - name: Build App
-      env:
-        _ACAT_FFMPEG_PATH: ${{ steps.setup-ffmpeg.outputs.ffmpeg-path }}
-      run: |
-        poetry run python -c "import build_script; build_script.test_build('WARN')"
-    - name: Zip dist folder on Unix
-      if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest' || matrix.os == 'self-hosted'
-      run: |
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GH_PAT }}
+      - uses: FedericoCarboni/setup-ffmpeg@v3
+        id: setup-ffmpeg
+        with:
+          ffmpeg-version: release
+      - name: Install poetry
+        run: |
+          curl -O -sSL https://install.python-poetry.org/install-poetry.py
+          python install-poetry.py -y 
+          rm install-poetry.py
+      - name: Set up poetry for macOS
+        if: matrix.os == 'macos-latest'
+        run: echo "${HOME}/.local/bin:$PATH" >> $GITHUB_PATH
+      - name: Set up poetry for Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: echo "${HOME}/.poetry/bin:${PATH}" >> $GITHUB_PATH
+      - name: Set up poetry for Windows
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $path = "$env:USERPROFILE\AppData\Roaming\Python\Scripts"
+          echo "$path" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Install ninja-build tool
+        if: matrix.os == 'windows-latest'
+        uses: seanmiddleditch/gha-setup-ninja@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        if: matrix.os != 'self-hosted'
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
+      - name: Set up Python ${{ matrix.python-version }} for self-hosted
+        if: matrix.os == 'self-hosted'
+        run: |
+          pyenv install ${{ matrix.python-version }} -s
+          pyenv global ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          poetry env use ${{ matrix.python-version }}
+          poetry install
+      - name: Print python versions
+        run: |
+          python -V
+          poetry run python -V
+      - name: Build App
+        env:
+          _ACAT_FFMPEG_PATH: ${{ steps.setup-ffmpeg.outputs.ffmpeg-path }}
+        run: |
+          poetry run python -c "import build_script; build_script.test_build('WARN')"
+      - name: Zip dist folder on Unix
+        if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest' || matrix.os == 'self-hosted'
+        run: |
           zip -ry dist.zip dist
-    - name: Zip dist folder on Windows
-      if: matrix.os == 'windows-latest'
-      run: |
+      - name: Zip dist folder on Windows
+        if: matrix.os == 'windows-latest'
+        run: |
           Compress-Archive -Path dist -DestinationPath dist.zip
-    - name: Upload a file to Google Drive
-      uses: willo32/google-drive-upload-action@v1
-      with:
-        target: dist.zip
-        credentials: ${{ secrets.GD_KEY }}
-        parent_folder_id: 1s724Lvy80htrI0YLuHerpxKmVWV2eewr
-        child_folder: ${{ matrix.os }}
-        name: ${{ matrix.os }}-${{ matrix.python-version }}-test-dist.zip
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ matrix.os }}-${{ matrix.python-version }}-test-dist
-        path: dist.zip
+      - name: Upload a file to Google Drive
+        uses: willo32/google-drive-upload-action@v1
+        with:
+          target: dist.zip
+          credentials: ${{ secrets.GD_KEY }}
+          parent_folder_id: 1s724Lvy80htrI0YLuHerpxKmVWV2eewr
+          child_folder: ${{ matrix.os }}
+          name: ${{ matrix.os }}-${{ matrix.python-version }}-test-dist.zip
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-${{ matrix.python-version }}-test-dist
+          path: dist.zip
