@@ -40,19 +40,19 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg
-        echo "_ACAT_FFMPEG_PATH=$(which ffmpeg)" >> $GITHUB_ENV
+        echo "_ACAT_FFMPEG_PATH=$(dirname $(which ffmpeg))" >> $GITHUB_ENV
     
     - name: Install FFmpeg (macOS)
       if: runner.os == 'macOS'
       run: |
         brew install ffmpeg
-        echo "_ACAT_FFMPEG_PATH=$(which ffmpeg)" >> $GITHUB_ENV
+        echo "_ACAT_FFMPEG_PATH=$(dirname $(which ffmpeg))" >> $GITHUB_ENV
     
     - name: Install FFmpeg (Windows)
       if: runner.os == 'Windows'
       run: |
         choco install ffmpeg -y
-        $ffmpegPath = (Get-Command ffmpeg).Path
+        $ffmpegPath = Split-Path -Parent (Get-Command ffmpeg).Path
         echo "_ACAT_FFMPEG_PATH=$ffmpegPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       shell: pwsh
     
